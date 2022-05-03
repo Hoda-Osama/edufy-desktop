@@ -1,4 +1,4 @@
-/*eslint-disable*/
+
 import {
   TextField,
   Box,
@@ -96,6 +96,7 @@ export function JoiningScreen({
   const getVideo = async () => {
     if (videoPlayerRef.current) {
       const videoConstraints = {
+        audio: true,
         video: {
           width: 1280,
           height: 720,
@@ -109,7 +110,9 @@ export function JoiningScreen({
 
       const videoTrack = videoTracks.length ? videoTracks[0] : null;
       videoPlayerRef.current.srcObject = new MediaStream([videoTrack]);
-      videoPlayerRef.current.play();
+      videoPlayerRef.current.play().catch(error => {
+        console.log(error);
+      })
       setVideoTrack(videoTrack);
 
 
@@ -120,7 +123,7 @@ export function JoiningScreen({
     if (webcamOn && !videoTrack) {
       getVideo();
     }
-  }, [webcamOn]);
+  }, [webcamOn, videoTrack]);
 
 
   return (
@@ -132,7 +135,7 @@ export function JoiningScreen({
         height: "100vh",
         alignItems: "center",
         backgroundColor: theme.palette.background.default,
-        padding: padding,
+
       }}>
       {readyToJoin ? (
         <Box
@@ -208,49 +211,39 @@ export function JoiningScreen({
                 <Grid
                   container
                   alignItems="center"
-                  justify="center"
+                  justifyContent="center"
                   spacing={2}>
                   <Grid item>
-                    <Tooltip
-                      title={micOn ? "Turn off mic" : "Turn on mic"}
-                      arrow
-                      placement="top">
-                      <Button
-                        onClick={() => _handleToggleMic()}
-                        variant="contained"
-                        style={
-                          micOn
-                            ? {}
-                            : {
-                              backgroundColor: red[500],
-                              color: "white",
-                            }
-                        }
-                        className={styles.toggleButton}>
-                        {micOn ? <Mic /> : <MicOff />}
-                      </Button>
-                    </Tooltip>
+                    <Button
+                      onClick={() => _handleToggleMic()}
+                      variant="contained"
+                      style={
+                        micOn
+                          ? {}
+                          : {
+                            backgroundColor: red[500],
+                            color: "white",
+                          }
+                      }
+                      className={styles.toggleButton}>
+                      {micOn ? <Mic /> : <MicOff />}
+                    </Button>
                   </Grid>
                   <Grid item>
-                    <Tooltip
-                      title={webcamOn ? "Turn off camera" : "Turn on camera"}
-                      arrow
-                      placement="top">
-                      <Button
-                        onClick={() => _handleToggleWebcam()}
-                        variant="contained"
-                        style={
-                          webcamOn
-                            ? {}
-                            : {
-                              backgroundColor: red[500],
-                              color: "white",
-                            }
-                        }
-                        className={styles.toggleButton}>
-                        {webcamOn ? <Videocam /> : <VideocamOff />}
-                      </Button>
-                    </Tooltip>
+                    <Button
+                      onClick={() => _handleToggleWebcam()}
+                      variant="contained"
+                      style={
+                        webcamOn
+                          ? {}
+                          : {
+                            backgroundColor: red[500],
+                            color: "white",
+                          }
+                      }
+                      className={styles.toggleButton}>
+                      {webcamOn ? <Videocam /> : <VideocamOff />}
+                    </Button>
                   </Grid>
                 </Grid>
               </Box>

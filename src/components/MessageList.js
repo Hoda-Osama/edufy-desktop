@@ -1,38 +1,67 @@
 import React from "react";
-
+import { useMeeting } from "@videosdk.live/react-sdk";
 const MessageList = ({ messages }) => {
+    const { localParticipant } = useMeeting();
     return (
-        <div>
+        <div style={{
+            height: "90%",
+            overflowY: "scroll",
+
+        }}>
             {messages?.map((message, i) => {
-                const { senderName, message: text, timestamp } = message;
+                const { senderName, message: text, timestamp, senderId } = message;
 
                 return (
                     <div
                         style={{
-                            margin: 8,
-                            backgroundColor: "darkblue",
-                            borderRadius: 8,
-                            overflow: "hidden",
-                            padding: 8,
-                            color: "#fff",
+                            display: "flex",
+                            flexDirection: localParticipant.id === senderId ? "row-reverse" : "row",
+                            marginBottom: "10px",
                         }}
                         key={i}
                     >
-                        <p style={{ margin: 0, padding: 0, fontStyle: "italic" }}>
-                            {senderName}
-                        </p>
-                        <h3 style={{ margin: 0, padding: 0, marginTop: 4 }}>{text}</h3>
-                        <p
+
+                        <div
                             style={{
-                                margin: 0,
-                                padding: 0,
-                                opacity: 0.6,
-                                marginTop: 4,
+                                marginLeft: 8,
+                                marginRight: 8,
+                                paddingLeft: 4,
+                                paddingRight: 4,
+                                display: "flex",
+                                alignItems: localParticipant.id === senderId ? "end" : "start",
+                                flexDirection: "column",
                             }}
+
                         >
-                            {formatAMPM(new Date(timestamp))}
-                        </p>
+
+                            <p style={{ margin: 0, padding: 0 }}>
+                                {localParticipant.id === senderId ? 'you' : senderName}
+                                <span
+                                    style={{
+                                        margin: 0,
+                                        padding: 0,
+                                        opacity: 0.6,
+                                        fontSize: "12px",
+                                        marginLeft: "10px",
+
+                                    }}
+                                >
+                                    {formatAMPM(new Date(timestamp))}
+                                </span>
+                            </p>
+
+                            <p style={{
+                                backgroundColor: "#DFF0FF", padding: 8, borderRadius: 8,
+                                margin: 0, marginTop: 4, width: "fit-content",
+                                maxWidth: "40ch",
+                                textOverflow: 'ellipsis'
+                            }}>{text}</p>
+
+
+
+                        </div>
                     </div>
+
                 );
             })}
         </div>

@@ -4,10 +4,9 @@ import { useParticipant } from "@videosdk.live/react-sdk";
 import RecordRTC, { RecordRTCPromisesHandler, invokeSaveAsDialog } from "recordrtc";
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
-
-const width = 200;;
-
-const ParticipantView = ({ participantId }) => {
+const RECORD_INTERVAL = 120000; // 2 minutes
+const RECORD_DURATION = 10000; // 10 seconds
+const ParticipantView = ({ participantId, setDisableMicBtn, setDisableCamBtn, setDisableShareBtn }) => {
     const webcamRef = useRef(null);
     const micRef = useRef(null);
     const screenShareRef = useRef(null);
@@ -37,43 +36,44 @@ const ParticipantView = ({ participantId }) => {
     } = useParticipant(participantId);
 
 
-    // const periodicStreamRecorder = async () => {
-    //   navigator.mediaDevices.getUserMedia({
-    //     video: true,
-    //     audio: false
-    //   }).then(async function (stream) {
-    //     let recorder = RecordRTC(stream, {
-    //       type: 'video',
-    //       mimeType: 'video/webm;codecs=vp9',
-    //     });
-    //     recorder.startRecording();
+    const periodicStreamRecorder = async () => {
+        navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false
+        }).then(async function (stream) {
+            let recorder = RecordRTC(stream, {
+                type: 'video',
+                mimeType: 'video/webm;codecs=vp9',
+            });
+            recorder.startRecording();
 
-    //     const sleep = m => new Promise(r => setTimeout(r, m));
-    //     await sleep(10000);
+            const sleep = m => new Promise(r => setTimeout(r, m));
+            await sleep(RECORD_DURATION);
 
-    //     recorder.stopRecording(() => {
-    //       let blob = recorder.getBlob();
-    //       invokeSaveAsDialog(blob);
+            recorder.stopRecording(() => {
+                //   let blob = recorder.getBlob(); // recorded video file
+                //   invokeSaveAsDialog(blob); // download the file locally 
 
-    //     });
-    //   });
+            });
+        });
 
-    // }
-    // const MINUTE_MS = 5000;
+    }
 
-    // useEffect(() => {
-    //   if (webcamOn) {
-    //     periodicStreamRecorder();
-    //   }
-    //   // const interval = setInterval(() => {
-    //   //   console.log('Logs every minute');
 
-    //   // }, MINUTE_MS);
+    useEffect(() => {
 
-    //   // return () => clearInterval(interval);
-    // }, [webcamOn])
+        const interval = setInterval(() => {
+            if (webcamOn) {
+                periodicStreamRecorder();
+            }
+
+        }, RECORD_INTERVAL);
+
+        return () => clearInterval(interval);
+    }, [webcamOn])
     useEffect(() => {
         if (webcamRef.current) {
+            setDisableCamBtn(false);
             if (webcamOn) {
                 const mediaStream = new MediaStream();
                 mediaStream.addTrack(webcamStream.track);
@@ -88,9 +88,10 @@ const ParticipantView = ({ participantId }) => {
                 webcamRef.current.srcObject = null;
             }
         }
-    }, [webcamStream, webcamOn]);
+    }, [webcamStream, webcamOn, setDisableCamBtn]);
     useEffect(() => {
         if (micRef.current) {
+            setDisableMicBtn(false);
             if (micOn) {
                 const mediaStream = new MediaStream();
                 mediaStream.addTrack(micStream.track);
@@ -105,10 +106,11 @@ const ParticipantView = ({ participantId }) => {
                 micRef.current.srcObject = null;
             }
         }
-    }, [micStream, micOn]);
+    }, [micStream, micOn, setDisableMicBtn]);
 
     useEffect(() => {
         if (screenShareRef.current) {
+            setDisableShareBtn(false)
             if (screenShareOn) {
                 const mediaStream = new MediaStream();
                 mediaStream.addTrack(screenShareStream.track);
@@ -123,7 +125,7 @@ const ParticipantView = ({ participantId }) => {
                 screenShareRef.current.srcObject = null;
             }
         }
-    }, [screenShareStream, screenShareOn]);
+    }, [screenShareStream, screenShareOn, setDisableShareBtn]);
 
     return (
         <div

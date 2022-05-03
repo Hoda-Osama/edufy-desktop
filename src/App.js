@@ -1,6 +1,6 @@
 /*eslint-disable*/
 import React, { useState } from "react";
-import { MeetingProvider, } from "@videosdk.live/react-sdk";
+import { MeetingProvider } from "@videosdk.live/react-sdk";
 import { getToken } from "./api";
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css

@@ -3,7 +3,8 @@ import React from "react";
 import { useMeeting } from "@videosdk.live/react-sdk";
 import ParticipantView from "./ParticipantView";
 import Grid from '@mui/material/Grid';
-const ParticipantsView = () => {
+
+const ParticipantsView = ({ setDisableMicBtn, setDisableCamBtn, setDisableShareBtn }) => {
     const { participants } = useMeeting();
 
     return (
@@ -23,10 +24,14 @@ const ParticipantsView = () => {
                 </div>
             ))} */}
             <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
-                {chunk([...participants.keys()]).map((k, index) => (
+                {chunk([...participants.keys()]).map((k) => (
                     k.map((l) => (
-                        <Grid item xs={2} sm={4} md={4} key={index}>
-                            <ParticipantView key={l} participantId={l} />
+                        <Grid item xs={2} sm={4} md={4} key={l} >
+                            <ParticipantView key={l} participantId={l}
+                                setDisableMicBtn={setDisableMicBtn}
+                                setDisableCamBtn={setDisableCamBtn}
+                                setDisableShareBtn={setDisableShareBtn}
+                            />
                         </Grid>
                     ))
                 ))}

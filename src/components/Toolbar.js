@@ -1,13 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useMeeting, useParticipant } from "@videosdk.live/react-sdk";
-
-import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
-import MuiToolbar from '@mui/material/Toolbar';
-// import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
 import VideocamIcon from '@mui/icons-material/Videocam';
@@ -15,10 +9,7 @@ import VideocamOffIcon from '@mui/icons-material/VideocamOff';
 import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
 import Grid from '@mui/material/Grid';
-
-
-
-const Toolbar = ({ participantId }) => {
+const Toolbar = ({ participantId, disableMicBtn, disableCamBtn, disableShareBtn }) => {
 
     const {
         leave,
@@ -78,9 +69,9 @@ const Toolbar = ({ participantId }) => {
                         <Button onClick={toggleWebcam} color="inherit">
                             {webcamOn ? <VideocamIcon style={{ color: 'white' }} /> : <VideocamOffIcon style={{ color: 'white' }} />}
                         </Button>
-                        <Button onClick={toggleScreenShare} color="inherit">
+                        {/* <Button onClick={toggleScreenShare} color="inherit">
                             {screenShareOn ? <ScreenShareIcon style={{ color: 'white' }} /> : <StopScreenShareIcon style={{ color: 'white' }} />}
-                        </Button>
+                        </Button> */}
                     </Grid>
                     <Grid item xs={4} style={{
                         display: "flex",

@@ -4,7 +4,6 @@ import Button from '@mui/material/Button';
 import SendIcon from '@mui/icons-material/Send';
 
 import MessageList from "./MessageList";
-import { Padding } from "@mui/icons-material";
 const borderRadius = 8;
 const MeetingChat = () => {
     const { publish, messages } = usePubSub("CHAT", {});
@@ -14,6 +13,7 @@ const MeetingChat = () => {
             width: "100%",
             height: "100%",
             position: "relative",
+            overflowY: "hidden",
         }}>
             <MessageList messages={messages} />
             <div style={{
@@ -27,6 +27,8 @@ const MeetingChat = () => {
                 <input
                     style={{
                         width: "100%",
+                        borderRadius: borderRadius,
+                        border: "2px solid #ccc",
                     }}
                     value={message}
                     onChange={(e) => {
