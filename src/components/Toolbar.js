@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import { useMeeting, useParticipant } from "@videosdk.live/react-sdk";
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -9,10 +9,24 @@ import VideocamOffIcon from '@mui/icons-material/VideocamOff';
 import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
 import Grid from '@mui/material/Grid';
+import UserContext from "../UserContext";
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+
 const Toolbar = ({ participantId, disableMicBtn, disableCamBtn, disableShareBtn }) => {
+    const { user } = useContext(UserContext);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
 
     const {
         leave,
+        end,
         toggleMic,
         toggleWebcam,
         toggleScreenShare,
@@ -77,8 +91,47 @@ const Toolbar = ({ participantId, disableMicBtn, disableCamBtn, disableShareBtn 
                         display: "flex",
                         justifyContent: "flex-end",
                     }}>
+                        {
+                            user ? (
+                                <>
+                                    <Button
+                                        id="basic-button"
+                                        aria-controls={open ? 'basic-menu' : undefined}
+                                        aria-haspopup="true"
+                                        aria-expanded={open ? 'true' : undefined}
+                                        onClick={handleClick}
+                                        variant="contained"
+                                        color="error"
+                                    >
+                                        LEAVE
+                                    </Button>
+                                    <Menu
+                                        id="basic-menu"
+                                        anchorEl={anchorEl}
+                                        open={open}
+                                        onClose={handleClose}
+                                        MenuListProps={{
+                                            'aria-labelledby': 'basic-button',
+                                        }}
+                                    >
+                                        <MenuItem onClick={() => {
+                                            handleClose()
+                                            end()
+                                            leave()
+                                        }}>END</MenuItem>
+                                        <MenuItem onClick={() => {
+                                            handleClose()
+                                            leave()
+                                        }}>LEAVE</MenuItem>
+                                    </Menu>
+                                </>
+                            ) : (
+                                <Button onClick={leave} variant="contained" color="error">LEAVE</Button>
+                            )
 
-                        <Button onClick={leave} variant="contained" color="error">LEAVE</Button>
+
+
+                        }
                     </Grid>
 
                 </Grid>

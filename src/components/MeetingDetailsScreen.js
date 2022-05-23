@@ -65,11 +65,6 @@ export function MeetingDetailsScreen({
         variant="outlined"
         defaultValue={meetingId}
         InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <Keyboard />
-            </InputAdornment>
-          ),
           endAdornment: (
             <InputAdornment position="end">
               <Button

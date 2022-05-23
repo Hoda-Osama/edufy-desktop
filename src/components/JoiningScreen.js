@@ -8,10 +8,9 @@ import {
   Grid,
   makeStyles,
   IconButton,
-  Tooltip,
   Typography,
 } from "@material-ui/core";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   Person,
   VideocamOff,
@@ -22,9 +21,12 @@ import {
 } from "@material-ui/icons";
 import useResponsiveSize from "../utils/useResponsiveSize";
 import { red } from "@material-ui/core/colors";
-import { MeetingDetailsScreen } from "./MeetingDetailsScreen";
+import { StudentJoiningScreen } from "./StudentJoiningScreen";
+import { InstructorJoiningScreen } from "./InstructorJoiningScreen";
+import { SelectType } from "./SelectType";
 import { createMeeting, getToken, validateMeeting } from "../api";
-
+import UserContext from "../UserContext";
+import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 const useStyles = makeStyles((theme) => ({
   video: {
     borderRadius: "10px",
@@ -63,10 +65,12 @@ export function JoiningScreen({
   webcamOn,
   onClickStartMeeting,
 }) {
+  const [isInstructor, setIsInstructor] = useState(null);
   const [readyToJoin, setReadyToJoin] = useState(false);
   const videoPlayerRef = useRef();
   const theme = useTheme();
   const styles = useStyles(theme);
+  const { user, setRegNumber } = useContext(UserContext);
 
   const [videoTrack, setVideoTrack] = useState(null);
 
@@ -148,6 +152,7 @@ export function JoiningScreen({
           <IconButton
             onClick={() => {
               setReadyToJoin(false);
+
             }}>
             <ArrowBack />
           </IconButton>
@@ -248,73 +253,213 @@ export function JoiningScreen({
                 </Grid>
               </Box>
             </Box>
-            <TextField
-              style={{
-                width: "100%",
-                marginTop: "1rem",
-              }}
-              id="outlined"
-              label="Name"
-              helperText={
-                participantName.length < 3
-                  ? "Enter Name with which you would like to join meeting"
-                  : ""
-              }
-              onChange={(e) => {
-                setParticipantName(e.target.value);
-              }}
-              variant="outlined"
-              defaultValue={participantName}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Person />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Button
-                      disabled={participantName.length < 3}
-                      color="primary"
-                      variant="contained"
-                      onClick={(e) => {
-                        if (videoTrack) {
-                          videoTrack.stop();
-                          setVideoTrack(null);
-                        }
-                        onClickStartMeeting();
-                      }}
-                      id={"btnJoin"}>
-                      Start
-                    </Button>
-                  </InputAdornment>
-                ),
-              }}
-            />
+            {user ? (
+              <TextField
+                style={{
+                  width: "100%",
+                  marginTop: "1rem",
+                }}
+                id="outlined"
+                label="Name"
+                helperText={
+                  participantName.length < 3
+                    ? "Enter Name with which you would like to join meeting"
+                    : ""
+                }
+                onChange={(e) => {
+                  setParticipantName(e.target.value);
+                }}
+                variant="outlined"
+                defaultValue={participantName}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Person />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Button
+                        disabled={participantName.length < 3}
+                        color="primary"
+                        variant="contained"
+                        onClick={(e) => {
+                          if (videoTrack) {
+                            videoTrack.stop();
+                            setVideoTrack(null);
+                          }
+                          onClickStartMeeting();
+                        }}
+                        id={"btnJoin"}>
+                        Start
+                      </Button>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            ) : (
+
+              <Grid container spacing={3} style={{
+                width: "60%",
+                margin: "auto",
+              }}>
+                <Grid item xs={12} style={{
+                  display: "flex",
+                  justifyContent: "center",
+
+                }}>
+                  <TextField
+                    style={{
+                      width: "100%",
+                      marginTop: "1rem",
+                    }}
+                    id="outlined"
+                    label="Name"
+                    helperText={
+                      participantName.length < 3
+                        ? "Enter Name with which you would like to join meeting"
+                        : ""
+                    }
+                    onChange={(e) => {
+                      setParticipantName(e.target.value);
+                    }}
+                    variant="outlined"
+                    defaultValue={participantName}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Person />
+                        </InputAdornment>
+                      ),
+
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} style={{
+                  display: "flex",
+                  justifyContent: "center",
+
+                }}>
+                  <TextField
+                    style={{
+                      width: "100%",
+                      marginTop: "1rem",
+                    }}
+                    type="number"
+                    id="outlined"
+                    label="Regstration Number"
+                    onChange={(e) => {
+                      setRegNumber(e.target.value);
+                    }}
+                    variant="outlined"
+                    defaultValue={participantName}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <AppRegistrationIcon />
+                        </InputAdornment>
+                      ),
+
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} style={{
+                  display: "flex",
+                  justifyContent: "center",
+
+                }}>
+                  <Button
+                    disabled={participantName.length < 3}
+                    color="primary"
+                    variant="contained"
+                    onClick={(e) => {
+                      if (videoTrack) {
+                        videoTrack.stop();
+                        setVideoTrack(null);
+                      }
+                      onClickStartMeeting();
+                    }}
+                    id={"btnJoin"}>
+                    Start
+                  </Button>
+                </Grid>
+              </Grid>
+            )}
+
+
           </Box>
         ) : (
-          <MeetingDetailsScreen
-            onClickJoin={async (id) => {
-              const token = await getToken();
-              const valid = await validateMeeting({ meetingId: id, token });
-              if (valid) {
-                setReadyToJoin(true);
-                setToken(token);
-                setMeetingId(id);
-                setWebcamOn(true);
-                setMicOn(true);
-              } else alert("Invalid Meeting Id");
-            }}
-            onClickCreateMeeting={async () => {
-              const token = await getToken();
-              const _meetingId = await createMeeting({ token });
-              setToken(token);
-              setMeetingId(_meetingId);
-              setReadyToJoin(true);
-              setWebcamOn(true);
-              setMicOn(true);
-            }}
-          />
+          <Box>
+            {isInstructor == null ? (
+
+              <SelectType
+                onClickSelectType={(type) => {
+                  setIsInstructor(type);
+                }}
+              />
+            ) : isInstructor === true ? (
+              <div style={{
+                display: "flex",
+                justifyContent: 'center'
+              }}>
+                <Box
+                  position="absolute"
+                  style={{
+                    top: theme.spacing(2),
+                    right: 0,
+                    left: theme.spacing(2),
+                  }}>
+                  <IconButton
+                    onClick={() => {
+                      setIsInstructor(null);
+                    }}>
+                    <ArrowBack />
+                  </IconButton>
+                </Box>
+                <InstructorJoiningScreen
+                  onClickCreateMeeting={async () => {
+                    const token = await getToken();
+                    const _meetingId = await createMeeting({ token });
+                    setToken(token);
+                    setMeetingId(_meetingId);
+                    setReadyToJoin(true);
+                    setWebcamOn(true);
+                    setMicOn(true);
+                  }}
+                />
+              </div>
+            ) : (
+              <>
+                <Box
+                  position="absolute"
+                  style={{
+                    top: theme.spacing(2),
+                    right: 0,
+                    left: theme.spacing(2),
+                  }}>
+                  <IconButton
+                    onClick={() => {
+                      setIsInstructor(null);
+                    }}>
+                    <ArrowBack />
+                  </IconButton>
+                </Box>
+                <StudentJoiningScreen
+                  onClickJoin={async (id) => {
+                    const token = await getToken();
+                    const valid = await validateMeeting({ meetingId: id, token });
+                    if (valid) {
+                      setReadyToJoin(true);
+                      setToken(token);
+                      setMeetingId(id);
+                      setWebcamOn(true);
+                      setMicOn(true);
+                    } else alert("Invalid Meeting Id");
+                  }}
+                />
+              </>
+            )}
+          </Box>
         )}
       </Grid>
     </Box>

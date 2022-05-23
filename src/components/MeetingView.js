@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useMeeting } from "@videosdk.live/react-sdk";
 import ParticipantsView from "./participant/ParticipantsView";
 import MeetingChat from "./MeetingChat";
@@ -7,7 +7,7 @@ import Toolbar from "./Toolbar";
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import CommentIcon from '@mui/icons-material/Comment';
-
+import Popover from '@mui/material/Popover';
 import { styled, useTheme } from '@mui/material/styles';
 import MuiToolbar from '@mui/material/Toolbar';
 import Drawer from '@mui/material/Drawer';
@@ -19,7 +19,9 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
-
+import UserContext from "../UserContext";
+import Button from '@mui/material/Button';
+import IosShareIcon from '@mui/icons-material/IosShare';
 const drawerWidth = 450;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -71,10 +73,12 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 
 
-const MeetingView = ({ onMeetingLeave }) => {
+const MeetingView = ({ onMeetingLeave, onMeetingEnd }) => {
     const [disableMicBtn, setDisableMicBtn] = useState(true);
     const [disableCamBtn, setDisableCamBtn] = useState(true);
     const [disableShareBtn, setDisableShareBtn] = useState(true);
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const { user } = useContext(UserContext);
     function onMeetingLeft() {
         console.log("onMeetingLeft");
         onMeetingLeave();
@@ -97,6 +101,7 @@ const MeetingView = ({ onMeetingLeave }) => {
         changeWebcam,
         changeMic,
     } = useMeeting({ onMeetingLeft });
+
     const theme = useTheme();
     const [open, setOpen] = useState(false);
     const handleDrawerOpen = () => {
@@ -106,6 +111,15 @@ const MeetingView = ({ onMeetingLeave }) => {
     const handleDrawerClose = () => {
         setOpen(false);
     };
+    const handleOpenInfoPopover = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleCloseInfoPopover = () => {
+        setAnchorEl(null);
+    };
+    const openInfoPopover = Boolean(anchorEl);
+    const id = openInfoPopover ? 'simple-popover' : undefined;
 
     return (
         <Box sx={{ display: 'flex' }}>
@@ -122,9 +136,28 @@ const MeetingView = ({ onMeetingLeave }) => {
             <CssBaseline />
             <AppBar position="fixed" open={open}>
                 <MuiToolbar style={{ backgroundColor: '#161B22' }}>
-                    <Typography variant="h6" noWrap sx={{ flexGrow: 1 }} component="span">
-                        Meeting ID : {meetingId}
-                    </Typography>
+                    <Box sx={{ flexGrow: 1 }}>
+                        <Button aria-describedby={id} variant="contained" onClick={handleOpenInfoPopover}>
+                            <IosShareIcon />  share
+                        </Button>
+                        <Popover
+                            id={id}
+                            open={openInfoPopover}
+                            anchorEl={anchorEl}
+                            onClose={handleCloseInfoPopover}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'left',
+                                overflow: 'hidden',
+                            }}
+
+                        >
+                            <Typography color={"black"} style={{ padding: "20px 20px 0px 20px" }} variant="h6" noWrap sx={{ flexGrow: 1 }} component="span">
+                                Meeting ID : {meetingId}
+                            </Typography>
+                        </Popover>
+                    </Box>
+
                     <IconButton
                         color="inherit"
                         aria-label="open drawer"

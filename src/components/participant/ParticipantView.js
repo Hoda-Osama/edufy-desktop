@@ -1,16 +1,17 @@
 
-import React, { useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { useParticipant } from "@videosdk.live/react-sdk";
 import RecordRTC, { RecordRTCPromisesHandler, invokeSaveAsDialog } from "recordrtc";
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
+import UserContext from "../../UserContext";
 const RECORD_INTERVAL = 5000; // 2 minutes
 const RECORD_DURATION = 2000; // 10 seconds
 const ParticipantView = ({ participantId, setDisableMicBtn, setDisableCamBtn, setDisableShareBtn }) => {
     const webcamRef = useRef(null);
     const micRef = useRef(null);
     const screenShareRef = useRef(null);
-
+    const { user } = useContext(UserContext);
 
     const {
         displayName,
@@ -62,7 +63,9 @@ const ParticipantView = ({ participantId, setDisableMicBtn, setDisableCamBtn, se
 
 
     useEffect(() => {
-
+        if (user) {
+            return;
+        }
         const interval = setInterval(() => {
             if (webcamOn && participant) {
                 periodicStreamRecorder();
@@ -71,7 +74,7 @@ const ParticipantView = ({ participantId, setDisableMicBtn, setDisableCamBtn, se
         }, RECORD_INTERVAL);
 
         return () => clearInterval(interval);
-    }, [webcamOn, participant])
+    }, [webcamOn, participant, user])
     useEffect(() => {
         if (webcamRef.current) {
             setDisableCamBtn(false);
