@@ -11,7 +11,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { auth } from '../firebase';
-
+import InstructorsServices from '../services/InstructorsServices';
 function Copyright(props) {
     return (
         <Typography variant="body2" color="gray" align="center" {...props}>
@@ -36,7 +36,7 @@ export default function SignUp({ onClickSignIn }) {
         // });
         try {
             const result = await createUserWithEmailAndPassword(auth, data.get('email'), data.get('password'));
-            console.log(result);
+            await InstructorsServices.addInstructor(result.user.uid);
         } catch (e) {
             console.log(e);
         }

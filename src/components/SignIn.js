@@ -36,7 +36,6 @@ export default function SignIn({ onClickSignUp }) {
         });
         try {
             const result = await signInWithEmailAndPassword(auth, data.get('email'), data.get('password'));
-            console.log(result);
         } catch (e) {
             console.log(e);
         }

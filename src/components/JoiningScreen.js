@@ -27,6 +27,7 @@ import { SelectType } from "./SelectType";
 import { createMeeting, getToken, validateMeeting } from "../api";
 import UserContext from "../UserContext";
 import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
+import InstructorsServices from '../services/InstructorsServices';
 const useStyles = makeStyles((theme) => ({
   video: {
     borderRadius: "10px",
@@ -67,6 +68,8 @@ export function JoiningScreen({
 }) {
   const [isInstructor, setIsInstructor] = useState(null);
   const [readyToJoin, setReadyToJoin] = useState(false);
+  const [meetingTitle, setMeetingTitle] = useState('');
+
   const videoPlayerRef = useRef();
   const theme = useTheme();
   const styles = useStyles(theme);
@@ -129,7 +132,28 @@ export function JoiningScreen({
     }
   }, [webcamOn, videoTrack]);
 
+  const handleStartMeeting = async () => {
+    if (videoTrack) {
+      videoTrack.stop();
+      setVideoTrack(null);
+    }
+    onClickStartMeeting();
 
+  }
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const uid = user.uid;
+      await InstructorsServices.updateInstructorMeetingData(uid, {
+        meetingRoomId: meetingId,
+        meetingTitle: meetingTitle
+      })
+    }
+    if (meetingId) {
+      fetchData();
+    }
+  }, [meetingId, user, meetingTitle]);
   return (
     <Box
       style={{
@@ -254,49 +278,57 @@ export function JoiningScreen({
               </Box>
             </Box>
             {user ? (
-              <TextField
-                style={{
-                  width: "100%",
-                  marginTop: "1rem",
-                }}
-                id="outlined"
-                label="Name"
-                helperText={
-                  participantName.length < 3
-                    ? "Enter Name with which you would like to join meeting"
-                    : ""
-                }
-                onChange={(e) => {
-                  setParticipantName(e.target.value);
-                }}
-                variant="outlined"
-                defaultValue={participantName}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Person />
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <Button
-                        disabled={participantName.length < 3}
-                        color="primary"
-                        variant="contained"
-                        onClick={(e) => {
-                          if (videoTrack) {
-                            videoTrack.stop();
-                            setVideoTrack(null);
-                          }
-                          onClickStartMeeting();
-                        }}
-                        id={"btnJoin"}>
-                        Start
-                      </Button>
-                    </InputAdornment>
-                  ),
-                }}
-              />
+              <Box>
+                <TextField
+                  style={{
+                    width: "100%",
+                    marginTop: "1rem",
+                  }}
+                  id="outlined"
+                  label="Meeting title"
+                  onChange={(e) => {
+                    setMeetingTitle(e.target.value);
+                  }}
+                  variant="outlined"
+                />
+                <TextField
+                  style={{
+                    width: "100%",
+                    marginTop: "1rem",
+                  }}
+                  id="outlined"
+                  label="Name"
+                  helperText={
+                    participantName.length < 3
+                      ? "Enter Name with which you would like to join meeting"
+                      : ""
+                  }
+                  onChange={(e) => {
+                    setParticipantName(e.target.value);
+                  }}
+                  variant="outlined"
+                  defaultValue={participantName}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Person />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <Button
+                          disabled={participantName.length < 3}
+                          color="primary"
+                          variant="contained"
+                          onClick={handleStartMeeting}
+                          id={"btnJoin"}>
+                          Start
+                        </Button>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Box>
             ) : (
 
               <Grid container spacing={3} style={{

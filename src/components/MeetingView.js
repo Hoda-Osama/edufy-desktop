@@ -80,7 +80,6 @@ const MeetingView = ({ onMeetingLeave, onMeetingEnd }) => {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const { user } = useContext(UserContext);
     function onMeetingLeft() {
-        console.log("onMeetingLeft");
         onMeetingLeave();
     }
     const {
