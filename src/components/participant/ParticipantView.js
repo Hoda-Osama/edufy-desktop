@@ -5,8 +5,9 @@ import RecordRTC, { RecordRTCPromisesHandler, invokeSaveAsDialog } from "recordr
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
 import UserContext from "../../UserContext";
-const RECORD_INTERVAL = 5000; // 2 minutes
-const RECORD_DURATION = 2000; // 10 seconds
+import axios from 'axios';
+const RECORD_INTERVAL = 30000; // 2 minutes
+const RECORD_DURATION = 10000; // 10 seconds
 const ParticipantView = ({ participantId, setDisableMicBtn, setDisableCamBtn, setDisableShareBtn }) => {
     const webcamRef = useRef(null);
     const micRef = useRef(null);
@@ -52,9 +53,24 @@ const ParticipantView = ({ participantId, setDisableMicBtn, setDisableCamBtn, se
             await sleep(RECORD_DURATION);
 
             recorder.stopRecording(() => {
-                // let blob = recorder.getBlob(); // recorded video file
+                let blob = recorder.getBlob(); // recorded video file
+                //let videoURL = window.URL.createObjectURL(blob);
+              const Url = URL.createObjectURL(blob);
 
-                // invokeSaveAsDialog(blob); // download the file locally 
+
+              var data = new FormData()
+              data.append('file', blob,'file.webm')
+
+              fetch('http://127.0.0.1:5000/', {
+                  method: 'POST',
+                  body: data
+
+              }).then(response => response.json()
+              ).then(json => {
+                  console.log(json)
+              });
+
+
 
             });
         });
